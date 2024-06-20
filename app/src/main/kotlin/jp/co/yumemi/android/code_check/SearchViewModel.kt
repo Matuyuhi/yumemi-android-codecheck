@@ -1,52 +1,53 @@
 /*
  * Copyright © 2021 YUMEMI Inc. All rights reserved.
+ *
+ * after: edit by matuyuhi
  */
 package jp.co.yumemi.android.code_check
 
 import android.content.Context
 import android.os.Parcelable
 import androidx.lifecycle.ViewModel
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.android.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import androidx.lifecycle.viewModelScope
+import io.ktor.client.HttpClient
+import io.ktor.client.call.receive
+import io.ktor.client.engine.android.Android
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import io.ktor.client.statement.HttpResponse
 import jp.co.yumemi.android.code_check.TopActivity.Companion.lastSearchDate
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
+import jp.co.yumemi.android.code_check.data.defaultHeader
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import org.json.JSONObject
-import java.util.*
+import java.util.Date
 
 /**
- * TwoFragment で使う
+ * SearchFragment で使う
  */
-class OneViewModel(
-    val context: Context
-) : ViewModel() {
+class SearchViewModel : ViewModel() {
 
     // 検索結果
-    fun searchResults(inputText: String): List<item> = runBlocking {
+    fun searchResults(inputText: String, context: Context, onSearchComplete: (List<Item>) -> Unit) {
         val client = HttpClient(Android)
-
-        return@runBlocking GlobalScope.async {
-            val response: HttpResponse = client?.get("https://api.github.com/search/repositories") {
-                header("Accept", "application/vnd.github.v3+json")
+        viewModelScope.launch {
+            val response: HttpResponse = client.get("https://api.github.com/search/repositories") {
+                defaultHeader()
                 parameter("q", inputText)
             }
 
             val jsonBody = JSONObject(response.receive<String>())
 
-            val jsonItems = jsonBody.optJSONArray("items")!!
+            val jsonItems = jsonBody.optJSONArray("items") ?: return@launch
 
-            val items = mutableListOf<item>()
+
+            val items = mutableListOf<Item>()
 
             /**
              * アイテムの個数分ループする
              */
             for (i in 0 until jsonItems.length()) {
-                val jsonItem = jsonItems.optJSONObject(i)!!
+                val jsonItem = jsonItems.optJSONObject(i) ?: continue
                 val name = jsonItem.optString("full_name")
                 val ownerIconUrl = jsonItem.optJSONObject("owner")!!.optString("avatar_url")
                 val language = jsonItem.optString("language")
@@ -56,7 +57,7 @@ class OneViewModel(
                 val openIssuesCount = jsonItem.optLong("open_issues_count")
 
                 items.add(
-                    item(
+                    Item(
                         name = name,
                         ownerIconUrl = ownerIconUrl,
                         language = context.getString(R.string.written_language, language),
@@ -69,14 +70,13 @@ class OneViewModel(
             }
 
             lastSearchDate = Date()
-
-            return@async items.toList()
-        }.await()
+            onSearchComplete(items)
+        }
     }
 }
 
 @Parcelize
-data class item(
+data class Item(
     val name: String,
     val ownerIconUrl: String,
     val language: String,
