@@ -1,5 +1,7 @@
 /*
  * Copyright © 2021 YUMEMI Inc. All rights reserved.
+ *
+ * after: edit by matuyuhi
  */
 package jp.co.yumemi.android.code_check
 
@@ -10,13 +12,13 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import coil.load
 import jp.co.yumemi.android.code_check.TopActivity.Companion.lastSearchDate
-import jp.co.yumemi.android.code_check.databinding.FragmentTwoBinding
+import jp.co.yumemi.android.code_check.databinding.FragmentResultBinding
 
-class TwoFragment : Fragment(R.layout.fragment_two) {
+class TwoFragment : Fragment(R.layout.fragment_result) {
 
     private val args: TwoFragmentArgs by navArgs()
 
-    private var binding: FragmentTwoBinding? = null
+    private var binding: FragmentResultBinding? = null
     private val _binding get() = binding!!
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -24,16 +26,16 @@ class TwoFragment : Fragment(R.layout.fragment_two) {
 
         Log.d("検索した日時", lastSearchDate.toString())
 
-        binding = FragmentTwoBinding.bind(view)
+        binding = FragmentResultBinding.bind(view)
 
         var item = args.item
 
-        _binding.ownerIconView.load(item.ownerIconUrl);
-        _binding.nameView.text = item.name;
-        _binding.languageView.text = item.language;
-        _binding.starsView.text = "${item.stargazersCount} stars";
-        _binding.watchersView.text = "${item.watchersCount} watchers";
-        _binding.forksView.text = "${item.forksCount} forks";
-        _binding.openIssuesView.text = "${item.openIssuesCount} open issues";
+        _binding.ownerIconView.load(item.ownerIconUrl)
+        _binding.nameView.text = item.name
+        _binding.languageView.text = item.language
+        _binding.starsView.text = "${item.stargazersCount} stars"
+        _binding.watchersView.text = "${item.watchersCount} watchers"
+        _binding.forksView.text = "${item.forksCount} forks"
+        _binding.openIssuesView.text = "${item.openIssuesCount} open issues"
     }
 }
