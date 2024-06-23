@@ -12,10 +12,10 @@
 
 ### 環境
 
-- IDE：Android Studio Flamingo | 2022.2.1 Patch 2
-- Kotlin：1.6.21
+- IDE：Android Studio Jellyfish | 2023.3.1 Patch 2
+- Kotlin：1.9.23
 - Java：17
-- Gradle：8.0
+- Gradle：8.4.2
 - minSdk：23
 - targetSdk：31
 
