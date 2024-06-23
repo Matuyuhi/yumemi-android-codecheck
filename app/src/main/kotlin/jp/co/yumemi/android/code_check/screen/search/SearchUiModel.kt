@@ -6,7 +6,7 @@ data class SearchUiModel(
     val inputText: String = "",
     val searchResults: List<Repository> = emptyList(),
     val isLoading: Boolean = false,
-    val lastUpdated: Long = 0
+    val lastUpdated: Long = 0,
 )
 
 

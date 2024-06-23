@@ -1,7 +1,7 @@
 package jp.co.yumemi.android.code_check.data.http
 
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class GitHubSearchEntity(
