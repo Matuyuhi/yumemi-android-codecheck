@@ -14,7 +14,7 @@
         android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
         android:fullBackupContent="@xml/backup_descriptor">
         <activity
-            android:name=".TopActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
