@@ -1,9 +1,9 @@
-package jp.co.yumemi.android.code_check.data
+package jp.co.yumemi.android.code_check.data.http
 
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 
 
 fun HttpRequestBuilder.defaultHeader() {
-    header("Accept", "application/vnd.github.v3+json")
+    header("Accept", "application/json")
 }
