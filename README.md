@@ -13,7 +13,7 @@
 ### 環境
 
 - IDE：Android Studio Jellyfish | 2023.3.1 Patch 2
-- Kotlin：1.9.23
+- Kotlin：1.9.0
 - Java：17
 - Gradle：8.4.2
 - minSdk：23
