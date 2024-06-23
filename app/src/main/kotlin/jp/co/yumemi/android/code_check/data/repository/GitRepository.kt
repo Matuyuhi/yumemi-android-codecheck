@@ -1,8 +1,12 @@
 package jp.co.yumemi.android.code_check.data.repository
 
 import jp.co.yumemi.android.code_check.data.http.ApiClient
+import jp.co.yumemi.android.code_check.data.http.GitHubSearchEntity
 import jp.co.yumemi.android.code_check.data.http.OwnerEntity
 import jp.co.yumemi.android.code_check.data.http.RepositoryEntity
+import jp.co.yumemi.android.code_check.data.ui.toLocalDateTimeWithTimeZone
+import kotlinx.datetime.LocalDateTime
+
 data class Owner(
     val login: String,
     val id: Long,
@@ -20,15 +24,16 @@ data class Owner(
         }
     }
 }
+
 data class Repository(
     val id: Long,
     val name: String,
     val description: String,
     val owner: Owner,
     val url: String,
-    val createdAt: String,
-    val updatedAt: String,
-    val startCount: Int,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+    val starCount: Int,
     val watchersCount: Int,
     val language: String,
     val forksCount: Int,
@@ -44,9 +49,9 @@ data class Repository(
                 description = gitHubRepository.description ?: "",
                 owner = Owner.fromGitHubOwner(gitHubRepository.owner),
                 url = gitHubRepository.htmlUrl,
-                createdAt = gitHubRepository.createdAt,
-                updatedAt = gitHubRepository.updatedAt,
-                startCount = gitHubRepository.stargazersCount,
+                createdAt = gitHubRepository.createdAt.toLocalDateTimeWithTimeZone(),
+                updatedAt = gitHubRepository.updatedAt.toLocalDateTimeWithTimeZone(),
+                starCount = gitHubRepository.stargazersCount,
                 watchersCount = gitHubRepository.watchersCount,
                 language = gitHubRepository.language ?: "",
                 forksCount = gitHubRepository.forksCount,
@@ -58,19 +63,39 @@ data class Repository(
     }
 }
 
+data class GetSearchRepositories(
+    val totalCount: Int,
+    val items: List<Repository>,
+) {
+    companion object {
+        fun fromGitHubRepositorySearchResponse(
+            gitHubRepositorySearchResponse: GitHubSearchEntity
+        ): GetSearchRepositories {
+            return GetSearchRepositories(
+                totalCount = gitHubRepositorySearchResponse.totalCount,
+                items = gitHubRepositorySearchResponse.items.map {
+                    Repository.fromGitHubRepository(it)
+                }
+            )
+        }
+    }
+
+}
+
 
 interface GitRepository {
 
-    suspend fun getGitRepositoryList(searchText: String): List<Repository>
+    suspend fun getGitRepositoryList(searchText: String): GetSearchRepositories
 }
+
+
 class GitRepositoryImpl(
     private val apiClient: ApiClient
 ) : GitRepository {
 
-    override suspend fun getGitRepositoryList(searchText: String): List<Repository> {
+    override suspend fun getGitRepositoryList(searchText: String): GetSearchRepositories {
         val response = apiClient.searchRepositories(searchText)
-        return response.items.map {
-            Repository.fromGitHubRepository(it)
-        }
+        return GetSearchRepositories
+            .fromGitHubRepositorySearchResponse(response)
     }
 }

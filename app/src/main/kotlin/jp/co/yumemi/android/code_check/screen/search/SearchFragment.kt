@@ -35,17 +35,17 @@ class SearchFragment : Fragment() {
         composeView?.apply {
             setContent {
                 AppTheme {
-                    SearchScreen { item ->
-                        gotoRepositoryFragment(item)
+                    SearchScreen { item, updated ->
+                        gotoRepositoryFragment(item, updated)
                     }
                 }
             }
         }
     }
 
-    private fun gotoRepositoryFragment(item: Repository) {
+    private fun gotoRepositoryFragment(item: Repository, updated: Long) {
         val action = SearchFragmentDirections
-            .actionRepositoriesFragmentToRepositoryFragment(item.toResultArgs())
+            .actionRepositoriesFragmentToRepositoryFragment(item.toResultArgs(updated))
         findNavController().navigate(action)
     }
 }

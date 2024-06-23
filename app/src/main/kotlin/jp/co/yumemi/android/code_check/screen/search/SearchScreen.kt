@@ -49,12 +49,12 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SearchScreen(
-    onSelect: (Repository) -> Unit
+    onSelect: (Repository, lastUpdate: Long) -> Unit
 ) = Box(
     modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colorScheme.background)
-){
+) {
     val viewModel: SearchViewModel = koinViewModel()
 
     val uiModel = viewModel.uiModel.collectAsState()
@@ -68,7 +68,9 @@ fun SearchScreen(
 
         SearchList(
             items = uiModel.value.searchResults,
-            onSelect = onSelect
+            onSelect = { repository ->
+                onSelect(repository, uiModel.value.lastUpdated)
+            }
         )
 
     }
@@ -90,7 +92,7 @@ private fun InputField(
         textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            unfocusedContainerColor =  MaterialTheme.colorScheme.secondaryContainer,
+            unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
         singleLine = true,
         enabled = uiModel.isLoading.not(),

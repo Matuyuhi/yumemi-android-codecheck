@@ -29,10 +29,12 @@ class SearchViewModel(
         override fun onInputTextChanged(inputText: String) {
             _uiModel.onInputTextChanged(inputText)
         }
+
         override fun onSearchComplete() {
             searchResults()
         }
     }
+
     // 検索結果
     fun searchResults() {
         viewModelScope.launch {
@@ -44,11 +46,12 @@ class SearchViewModel(
             runCatching {
                 gitRepository.getGitRepositoryList(inputText)
             }.fold(
-                onSuccess = { items ->
-                    _uiModel.onSearchComplete(items)
+                onSuccess = { result ->
+                    _uiModel.onSearchComplete(result.items)
                 },
                 onFailure = {
                     _error.value = it
+                    println("error: $it")
                 }
             )
         }
@@ -58,12 +61,16 @@ class SearchViewModel(
         emit(value.copy(isLoading = true))
     }
 
-    private suspend fun MutableStateFlow<SearchUiModel>.onSearchComplete(items: List<Repository>) {
-        emit(value.copy(
-            searchResults = items,
-            isLoading = false,
-            lastUpdated = System.currentTimeMillis()
-        ))
+    private suspend fun MutableStateFlow<SearchUiModel>.onSearchComplete(
+        items: List<Repository>
+    ) {
+        emit(
+            value.copy(
+                searchResults = items,
+                isLoading = false,
+                lastUpdated = System.currentTimeMillis()
+            )
+        )
     }
 
     private fun MutableStateFlow<SearchUiModel>.onInputTextChanged(inputText: String) {
