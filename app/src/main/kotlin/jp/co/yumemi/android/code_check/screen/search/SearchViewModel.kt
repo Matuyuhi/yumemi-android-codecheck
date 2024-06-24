@@ -8,6 +8,7 @@ package jp.co.yumemi.android.code_check.screen.search
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import jp.co.yumemi.android.code_check.data.repository.GetSearchRepositories
 import jp.co.yumemi.android.code_check.data.repository.GitRepository
 import jp.co.yumemi.android.code_check.data.repository.Repository
 import jp.co.yumemi.android.code_check.data.ui.UiEventException
@@ -33,18 +34,36 @@ class SearchViewModel(
         }
 
         override val onSearchComplete: () -> Unit = {
-            searchResults()
+            searchResults { result ->
+                _uiModel.searchComplete(result.items)
+            }
         }
         override val onErrorRetry: () -> Unit = {
-            searchResults()
+            searchResults { result ->
+                _uiModel.searchComplete(result.items)
+            }
         }
         override val onErrorClose: () -> Unit = {
             _error.value = UiEventException()
         }
+        override val onFetchMore: () -> Unit = onFetchMore@{
+            println("onFetchMore")
+            if (uiModel.value.searchResults.size + PER_PAGE > MAX_SEARCH_RESULT) {
+                return@onFetchMore
+            }
+            println("onFetchMore2")
+            searchResults(offset = uiModel.value.searchResults.size) {
+                _uiModel.addSearchResults(it.items)
+            }
+        }
     }
 
     // 検索結果
-    fun searchResults() {
+    fun searchResults(
+        count: Int = PER_PAGE,
+        offset: Int = 0,
+        onCompleted: suspend (GetSearchRepositories) -> Unit
+    ) {
         viewModelScope.launch {
             val inputText = uiModel.value.inputText
             if (inputText.isEmpty()) {
@@ -52,14 +71,14 @@ class SearchViewModel(
             }
             _uiModel.setLoading()
             runCatching {
-                gitRepository.getGitRepositoryList(inputText)
+                gitRepository.getGitRepositoryList(inputText, count = count, offset = offset)
             }.fold(
                 onSuccess = { result ->
-                    _uiModel.onSearchComplete(result.items)
+                    onCompleted(result)
                 },
                 onFailure = {
                     _error.value = UiEventException(it)
-                    Log.e("SearchViewModel", "searchResults: $it")
+                    Log.e(TAG, "searchResults: $it")
                 }
             ).also {
                 _uiModel.stopLoading()
@@ -75,7 +94,7 @@ class SearchViewModel(
         emit(value.copy(isLoading = false))
     }
 
-    private suspend fun MutableStateFlow<SearchUiModel>.onSearchComplete(
+    private suspend fun MutableStateFlow<SearchUiModel>.searchComplete(
         items: List<Repository>
     ) {
         emit(
@@ -87,8 +106,26 @@ class SearchViewModel(
         )
     }
 
+    private suspend fun MutableStateFlow<SearchUiModel>.addSearchResults(
+        items: List<Repository>
+    ) {
+        emit(
+            value.copy(
+                searchResults = value.searchResults + items,
+                isLoading = false,
+                lastUpdated = System.currentTimeMillis()
+            )
+        )
+    }
+
     private fun MutableStateFlow<SearchUiModel>.onInputTextChanged(inputText: String) {
         value = value.copy(inputText = inputText)
+    }
+
+    companion object {
+        private const val TAG = "SearchViewModel"
+        private const val MAX_SEARCH_RESULT = 100
+        private const val PER_PAGE = 20
     }
 }
 
@@ -97,4 +134,5 @@ interface SearchScreenUiEvent {
     val onSearchComplete: () -> Unit
     val onErrorRetry: () -> Unit
     val onErrorClose: () -> Unit
+    val onFetchMore: () -> Unit
 }

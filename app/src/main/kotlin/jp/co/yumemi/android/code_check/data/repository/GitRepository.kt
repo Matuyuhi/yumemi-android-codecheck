@@ -85,7 +85,16 @@ data class GetSearchRepositories(
 
 interface GitRepository {
 
-    suspend fun getGitRepositoryList(searchText: String): GetSearchRepositories
+    suspend fun getGitRepositoryList(
+        searchText: String,
+        count: Int = PER_PAGE,
+        offset: Int = 0
+    ): GetSearchRepositories
+
+
+    companion object {
+        const val PER_PAGE = 30
+    }
 }
 
 
@@ -93,9 +102,16 @@ class GitRepositoryImpl(
     private val apiClient: ApiClient
 ) : GitRepository {
 
-    override suspend fun getGitRepositoryList(searchText: String): GetSearchRepositories {
-        val response = apiClient.searchRepositories(searchText)
+    override suspend fun getGitRepositoryList(
+        searchText: String,
+        count: Int,
+        offset: Int
+    ): GetSearchRepositories {
+        val response = apiClient.searchRepositories(
+            query = searchText, count = count, offset = offset
+        )
         return GetSearchRepositories
             .fromGitHubRepositorySearchResponse(response)
     }
+
 }

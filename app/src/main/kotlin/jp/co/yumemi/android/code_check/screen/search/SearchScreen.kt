@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -42,6 +43,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
@@ -53,6 +55,7 @@ import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.data.repository.Repository
 import jp.co.yumemi.android.code_check.data.ui.ErrorDialog
 import jp.co.yumemi.android.code_check.data.ui.LoadingDialog
+import jp.co.yumemi.android.code_check.data.ui.OnBottomReached
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -76,10 +79,13 @@ fun SearchScreen(
             uiModel = uiModel.value,
             event = eventListener
         )
-        Spacer(modifier = Modifier.height(30.dp))
+        Spacer(modifier = Modifier.height(5.dp))
 
         SearchList(
             items = uiModel.value.searchResults,
+            onFetchMore = {
+                eventListener.onFetchMore()
+            },
             onSelect = { repository ->
                 onSelect(repository, uiModel.value.lastUpdated)
             }
@@ -179,25 +185,93 @@ private fun InputField(
 @Composable
 private fun ColumnScope.SearchList(
     items: List<Repository>,
+    onFetchMore: () -> Unit,
     onSelect: (Repository) -> Unit
+) = Column(
+    modifier = Modifier
+        .weight(1f)
+        .fillMaxWidth()
+        .background(MaterialTheme.colorScheme.surface)
 ) {
-    LazyColumn(
+    val listState = rememberLazyListState()
+    if (items.isNotEmpty()) {
+        listState.OnBottomReached(buffer = 3) {
+            onFetchMore()
+        }
+    }
+
+    if (items.isNotEmpty()) {
+        Text(
+            text = stringResource(id = R.string.search_result, items.size),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier
+                .padding(horizontal = 20.dp, vertical = 10.dp)
+        )
+    }
+    Box(
         modifier = Modifier
-            .fillMaxWidth()
             .weight(1f)
-            .padding(horizontal = 20.dp)
+            .padding(bottom = 10.dp)
     ) {
-        items(
-            count = items.size,
-        ) { index ->
-            Column {
-                val item = items[index]
-                RepositoryItem(
-                    repository = item,
-                    onClick = { onSelect(item) }
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+        ) {
+            items(
+                count = items.size,
+                key = { index -> items[index].id }
+            ) { index ->
+                Column {
+                    val item = items[index]
+                    RepositoryItem(
+                        repository = item,
+                        onClick = { onSelect(item) }
+                    )
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        }
+        // draw behind scrollable area to show gradient
+        Column(
+            modifier = Modifier
+                .matchParentSize()
+        ) {
+            val height = 80.dp
+            if (listState.canScrollBackward) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(height)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    MaterialTheme.colorScheme.surfaceContainer,
+                                    Color.Transparent
+                                )
+                            )
+                        )
                 )
-                HorizontalDivider(
-                    color = MaterialTheme.colorScheme.secondary
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if (listState.canScrollForward) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(height)
+                        .background(
+                            Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Transparent,
+                                    MaterialTheme.colorScheme.surfaceContainer
+                                )
+                            )
+                        )
                 )
             }
         }
