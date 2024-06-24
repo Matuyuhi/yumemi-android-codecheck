@@ -21,14 +21,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -38,13 +42,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.data.repository.Repository
-import jp.co.yumemi.android.code_check.data.ui.Loading
+import jp.co.yumemi.android.code_check.data.ui.ErrorDialog
+import jp.co.yumemi.android.code_check.data.ui.LoadingDialog
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -57,12 +65,16 @@ fun SearchScreen(
 ) {
     val viewModel: SearchViewModel = koinViewModel()
 
+    val eventListener = viewModel.eventListener
+
     val uiModel = viewModel.uiModel.collectAsState()
+
+    val uiError = viewModel.error.collectAsState()
 
     Column {
         InputField(
             uiModel = uiModel.value,
-            event = viewModel.eventListener
+            event = eventListener
         )
         Spacer(modifier = Modifier.height(30.dp))
 
@@ -75,7 +87,12 @@ fun SearchScreen(
 
     }
 
-    Loading(isVisible = uiModel.value.isLoading)
+    LoadingDialog(isVisible = uiModel.value.isLoading)
+    ErrorDialog(
+        error = uiError.value,
+        onDismiss = eventListener.onErrorClose,
+        onRetry = eventListener.onErrorRetry
+    )
 }
 
 
@@ -84,49 +101,78 @@ private fun InputField(
     uiModel: SearchUiModel,
     event: SearchScreenUiEvent
 ) {
-    TextField(
-        value = uiModel.inputText,
-        onValueChange = {
-            event.onInputTextChanged(it)
-        },
-        textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
-            unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = 10.dp
         ),
-        singleLine = true,
-        enabled = uiModel.isLoading.not(),
-        placeholder = {
-            Text(
-                text = "Search",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSecondary,
-                modifier = Modifier
-            )
-        },
-        trailingIcon = {
-            Image(
-                Icons.Outlined.Search,
-                contentDescription = "search",
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
-                modifier = Modifier
-                    .size(45.dp)
-                    .border(1.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                    .clickable { event.onSearchComplete() }
-                    .padding(5.dp)
-            )
-        },
-        keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Search
-        ),
-        keyboardActions = KeyboardActions(
-            onSearch = { event.onSearchComplete() }
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 10.dp, horizontal = 20.dp)
-            .border(1.dp, MaterialTheme.colorScheme.primary)
-    )
+            .padding(horizontal = 10.dp, vertical = 20.dp)
+    ) {
+        TextField(
+            value = uiModel.inputText,
+            onValueChange = {
+                event.onInputTextChanged(it)
+            },
+            textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent
+            ),
+            singleLine = true,
+            enabled = uiModel.isLoading.not(),
+            placeholder = {
+                Text(
+                    text = stringResource(id = R.string.searchInputText_hint),
+                    style = MaterialTheme.typography.labelSmall,
+                    maxLines = 1,
+                    modifier = Modifier
+                )
+            },
+            leadingIcon = {
+                FilledTonalIconButton(
+                    onClick = {
+                        event.onSearchComplete()
+                    },
+                    enabled = uiModel.isLoading.not() && uiModel.inputText.isNotEmpty()
+                ) {
+                    Image(
+                        Icons.Outlined.Search,
+                        contentDescription = "search",
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
+                }
+            },
+            trailingIcon = {
+                if (uiModel.inputText.isNotEmpty()) {
+                    IconButton(
+                        onClick = { event.onInputTextChanged("") }
+                    ) {
+                        Image(
+                            Icons.Rounded.Clear,
+                            contentDescription = "clear",
+                            modifier = Modifier
+                                .size(20.dp)
+                        )
+                    }
+                }
+            },
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = { event.onSearchComplete() }
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp, horizontal = 20.dp)
+        )
+    }
 }
 
 

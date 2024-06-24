@@ -8,5 +8,3 @@ data class SearchUiModel(
     val isLoading: Boolean = false,
     val lastUpdated: Long = 0,
 )
-
-

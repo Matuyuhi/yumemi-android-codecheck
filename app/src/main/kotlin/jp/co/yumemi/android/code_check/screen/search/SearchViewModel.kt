@@ -5,10 +5,12 @@
  */
 package jp.co.yumemi.android.code_check.screen.search
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import jp.co.yumemi.android.code_check.data.repository.GitRepository
 import jp.co.yumemi.android.code_check.data.repository.Repository
+import jp.co.yumemi.android.code_check.data.ui.UiEventException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -22,16 +24,22 @@ class SearchViewModel(
     private val _uiModel = MutableStateFlow(SearchUiModel())
     val uiModel = _uiModel.asStateFlow()
 
-    private val _error = MutableStateFlow<Throwable?>(null)
+    private val _error = MutableStateFlow(UiEventException())
     val error = _error.asStateFlow()
 
     val eventListener = object : SearchScreenUiEvent {
-        override fun onInputTextChanged(inputText: String) {
+        override val onInputTextChanged: (String) -> Unit = { inputText ->
             _uiModel.onInputTextChanged(inputText)
         }
 
-        override fun onSearchComplete() {
+        override val onSearchComplete: () -> Unit = {
             searchResults()
+        }
+        override val onErrorRetry: () -> Unit = {
+            searchResults()
+        }
+        override val onErrorClose: () -> Unit = {
+            _error.value = UiEventException()
         }
     }
 
@@ -50,15 +58,21 @@ class SearchViewModel(
                     _uiModel.onSearchComplete(result.items)
                 },
                 onFailure = {
-                    _error.value = it
-                    println("error: $it")
+                    _error.value = UiEventException(it)
+                    Log.e("SearchViewModel", "searchResults: $it")
                 }
-            )
+            ).also {
+                _uiModel.stopLoading()
+            }
         }
     }
 
     private suspend fun MutableStateFlow<SearchUiModel>.setLoading() {
         emit(value.copy(isLoading = true))
+    }
+
+    private suspend fun MutableStateFlow<SearchUiModel>.stopLoading() {
+        emit(value.copy(isLoading = false))
     }
 
     private suspend fun MutableStateFlow<SearchUiModel>.onSearchComplete(
@@ -79,6 +93,8 @@ class SearchViewModel(
 }
 
 interface SearchScreenUiEvent {
-    fun onInputTextChanged(inputText: String)
-    fun onSearchComplete()
+    val onInputTextChanged: (inputText: String) -> Unit
+    val onSearchComplete: () -> Unit
+    val onErrorRetry: () -> Unit
+    val onErrorClose: () -> Unit
 }

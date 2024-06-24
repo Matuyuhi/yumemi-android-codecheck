@@ -13,4 +13,8 @@
     <string name="topic_count">topics: %s</string>
     <string name="licence">LICENCE NAME: %s</string>
     <string name="search_update_at">最終更新: %s</string>
+    <string name="error_title">エラー!</string>
+    <string name="error_description">インターネット接続を確認して、もう一度お試しください</string>
+    <string name="error_retry">再試行</string>
+    <string name="close">閉じる</string>
 </resources>
