@@ -43,6 +43,14 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
+    packaging {
+        resources {
+            excludes.add("META-INF/LICENSE.md")
+            excludes.add("META-INF/LICENSE-notice.md")
+            excludes.add("META-INF/AL2.0")
+            excludes.add("META-INF/LGPL2.1")
+        }
+    }
 }
 
 dependencies {
@@ -76,6 +84,9 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     implementation(libs.androidx.ui.text.google.fonts)
 
+    androidTestImplementation(libs.mockk)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.koin.test)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
