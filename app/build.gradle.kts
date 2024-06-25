@@ -1,21 +1,25 @@
+import dependencies.BuildConfig
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlinx.serialization)
     id("kotlin-parcelize")
     alias(libs.plugins.androidx.navigation.safeargs)
+    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.gms.google.service)
 }
 
 android {
-    namespace = "jp.co.yumemi.android.code_check"
-    compileSdk = 34
+    namespace = BuildConfig.namespace
+    compileSdk = BuildConfig.compileSdk
 
     defaultConfig {
-        applicationId = "jp.co.yumemi.android.codecheck"
-        minSdk =  23
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        applicationId = BuildConfig.appId
+        minSdk = BuildConfig.minSdk
+        targetSdk = BuildConfig.targetSdk
+        versionCode = BuildConfig.versionCode
+        versionName = BuildConfig.versionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -27,17 +31,17 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = BuildConfig.compatibility
+        targetCompatibility = BuildConfig.compatibility
     }
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = BuildConfig.JvmTarget
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 }
 
@@ -79,4 +83,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 }

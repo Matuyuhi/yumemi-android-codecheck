@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "536949582470",
+    "project_id": "yumemi-code-check",
+    "storage_bucket": "yumemi-code-check.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:536949582470:android:86e04c7f492d725f63ff07",
+        "android_client_info": {
+          "package_name": "jp.co.yumemi.android.codecheck"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCJSYzytDvLK2ap7gDuU7SaCawOkT3TS4g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

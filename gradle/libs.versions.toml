@@ -1,6 +1,7 @@
 [versions]
 agp = "8.4.2"
 coil = "2.6.0"
+composeCompiler = "1.5.1"
 constraintlayout = "2.1.4"
 gradle = "8.0.2"
 kotlin = "1.9.0"
@@ -17,10 +18,12 @@ composeBom = "2024.04.01"
 navigation = "2.7.7"
 koin = "3.5.6"
 recyclerview = "1.3.2"
-voyagerNavigator = "1.1.0-beta02"
 kotlinxSerialization = "1.6.3"
 kotlinxDatetime = "0.5.0"
 uiTextGoogleFonts = "1.6.8"
+gms = "4.4.2"
+firebaseBom = "33.1.1"
+crushlytics = "2.9.9"
 
 [libraries]
 androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
@@ -59,8 +62,15 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
+firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics-ktx" }
+
+
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 androidx-navigation-safeargs = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }
+gms-google-service = { id = "com.google.gms.google-services", version.ref = "gms" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crushlytics" }
