@@ -18,4 +18,5 @@
     <string name="error_retry">再試行</string>
     <string name="close">閉じる</string>
     <string name="search_result">検索結果: %s件</string>
+    <string name="sort">ソート</string>
 </resources>

@@ -4,6 +4,7 @@ import jp.co.yumemi.android.code_check.data.http.ApiClient
 import jp.co.yumemi.android.code_check.data.http.GitHubSearchEntity
 import jp.co.yumemi.android.code_check.data.http.OwnerEntity
 import jp.co.yumemi.android.code_check.data.http.RepositoryEntity
+import jp.co.yumemi.android.code_check.data.http.SortType
 import jp.co.yumemi.android.code_check.data.ui.toLocalDateTimeWithTimeZone
 import kotlinx.datetime.LocalDateTime
 
@@ -88,7 +89,8 @@ interface GitRepository {
     suspend fun getGitRepositoryList(
         searchText: String,
         count: Int = PER_PAGE,
-        offset: Int = 0
+        offset: Int = 0,
+        sort: SortType = SortType.Stars
     ): GetSearchRepositories
 
 
@@ -105,10 +107,11 @@ class GitRepositoryImpl(
     override suspend fun getGitRepositoryList(
         searchText: String,
         count: Int,
-        offset: Int
+        offset: Int,
+        sort: SortType
     ): GetSearchRepositories {
         val response = apiClient.searchRepositories(
-            query = searchText, count = count, offset = offset
+            query = searchText, count = count, offset = offset, sort = sort
         )
         return GetSearchRepositories
             .fromGitHubRepositorySearchResponse(response)

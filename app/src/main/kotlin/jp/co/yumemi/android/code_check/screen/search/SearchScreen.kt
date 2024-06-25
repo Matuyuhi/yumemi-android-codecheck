@@ -27,12 +27,17 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,6 +45,8 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,9 +56,11 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import jp.co.yumemi.android.code_check.R
+import jp.co.yumemi.android.code_check.data.http.SortType
 import jp.co.yumemi.android.code_check.data.repository.Repository
 import jp.co.yumemi.android.code_check.data.ui.ErrorDialog
 import jp.co.yumemi.android.code_check.data.ui.LoadingDialog
@@ -80,6 +89,88 @@ fun SearchScreen(
             event = eventListener
         )
         Spacer(modifier = Modifier.height(5.dp))
+
+        val items = uiModel.value.searchResults
+        val expanded = remember { mutableStateOf(false) }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(horizontal = 20.dp, vertical = 3.dp)
+        ) {
+            Button(
+                onClick = {
+                    expanded.value = true
+                },
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = MaterialTheme.colorScheme.onSurface,
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                )
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Menu,
+                    contentDescription = "sort",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = uiModel.value.sortType.value,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if (items.isNotEmpty()) {
+                Text(
+                    text = stringResource(id = R.string.search_result, items.size),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                if (items.size >= SearchUiModel.MAX_SEARCH_RESULT) {
+                    Text(
+                        text = "MAX",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        modifier = Modifier
+                            .padding(horizontal = 2.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(MaterialTheme.colorScheme.primary)
+                            .padding(horizontal = 5.dp, vertical = 2.dp)
+                    )
+                }
+            }
+            DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false },
+                offset = DpOffset(0.dp, 0.dp),
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.sort),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                SortType.entries.forEach { sortType ->
+                    Text(
+                        text = sortType.value,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier
+                            .clickable {
+                                eventListener.onSetSort(sortType)
+                                expanded.value = false
+                            }
+                            .fillMaxWidth()
+                            .padding(bottom = 2.dp, top = 15.dp)
+                    )
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
+        }
+
 
         SearchList(
             items = uiModel.value.searchResults,
@@ -200,15 +291,6 @@ private fun ColumnScope.SearchList(
         }
     }
 
-    if (items.isNotEmpty()) {
-        Text(
-            text = stringResource(id = R.string.search_result, items.size),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier
-                .padding(horizontal = 20.dp, vertical = 10.dp)
-        )
-    }
     Box(
         modifier = Modifier
             .weight(1f)

@@ -8,6 +8,7 @@ package jp.co.yumemi.android.code_check.screen.search
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import jp.co.yumemi.android.code_check.data.http.SortType
 import jp.co.yumemi.android.code_check.data.repository.GetSearchRepositories
 import jp.co.yumemi.android.code_check.data.repository.GitRepository
 import jp.co.yumemi.android.code_check.data.repository.Repository
@@ -47,20 +48,27 @@ class SearchViewModel(
             _error.value = UiEventException()
         }
         override val onFetchMore: () -> Unit = onFetchMore@{
-            println("onFetchMore")
-            if (uiModel.value.searchResults.size + PER_PAGE > MAX_SEARCH_RESULT) {
+            if (uiModel.value.searchResults.size + SearchUiModel.PER_PAGE > SearchUiModel.MAX_SEARCH_RESULT) {
                 return@onFetchMore
             }
-            println("onFetchMore2")
             searchResults(offset = uiModel.value.searchResults.size) {
                 _uiModel.addSearchResults(it.items)
+            }
+        }
+        override val onSetSort: (SortType) -> Unit = { sortType ->
+            _uiModel.setSort(sortType)
+            // 再度検索をする
+            if (uiModel.value.inputText.isNotEmpty()) {
+                searchResults { result ->
+                    _uiModel.searchComplete(result.items)
+                }
             }
         }
     }
 
     // 検索結果
     fun searchResults(
-        count: Int = PER_PAGE,
+        count: Int = SearchUiModel.PER_PAGE,
         offset: Int = 0,
         onCompleted: suspend (GetSearchRepositories) -> Unit
     ) {
@@ -71,7 +79,12 @@ class SearchViewModel(
             }
             _uiModel.setLoading()
             runCatching {
-                gitRepository.getGitRepositoryList(inputText, count = count, offset = offset)
+                gitRepository.getGitRepositoryList(
+                    inputText,
+                    count = count,
+                    offset = offset,
+                    sort = uiModel.value.sortType
+                )
             }.fold(
                 onSuccess = { result ->
                     onCompleted(result)
@@ -122,10 +135,12 @@ class SearchViewModel(
         value = value.copy(inputText = inputText)
     }
 
+    private fun MutableStateFlow<SearchUiModel>.setSort(sortType: SortType) {
+        value = value.copy(sortType = sortType)
+    }
+
     companion object {
         private const val TAG = "SearchViewModel"
-        private const val MAX_SEARCH_RESULT = 100
-        private const val PER_PAGE = 20
     }
 }
 
@@ -135,4 +150,5 @@ interface SearchScreenUiEvent {
     val onErrorRetry: () -> Unit
     val onErrorClose: () -> Unit
     val onFetchMore: () -> Unit
+    val onSetSort: (SortType) -> Unit
 }

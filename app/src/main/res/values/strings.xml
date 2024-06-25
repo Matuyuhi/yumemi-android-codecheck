@@ -18,4 +18,5 @@
     <string name="error_retry">Retry</string>
     <string name="close">Close</string>
     <string name="search_result">search: %s</string>
+    <string name="sort">Sort</string>
 </resources>
