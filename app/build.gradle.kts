@@ -4,6 +4,8 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     id("kotlin-parcelize")
     alias(libs.plugins.androidx.navigation.safeargs)
+    alias(libs.plugins.gms.google.service)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -79,4 +81,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
 }
