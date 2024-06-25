@@ -56,26 +56,29 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import jp.co.yumemi.android.code_check.R
 import jp.co.yumemi.android.code_check.data.http.SortType
 import jp.co.yumemi.android.code_check.data.repository.Repository
+import jp.co.yumemi.android.code_check.data.ui.AppTheme
 import jp.co.yumemi.android.code_check.data.ui.ErrorDialog
 import jp.co.yumemi.android.code_check.data.ui.LoadingDialog
 import jp.co.yumemi.android.code_check.data.ui.OnBottomReached
+import jp.co.yumemi.android.code_check.mock.searchViewModelMock
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun SearchScreen(
+    viewModel: SearchViewModel = koinViewModel(),
     onSelect: (Repository, lastUpdate: Long) -> Unit
 ) = Box(
     modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colorScheme.background)
 ) {
-    val viewModel: SearchViewModel = koinViewModel()
 
     val eventListener = viewModel.eventListener
 
@@ -397,6 +400,17 @@ private fun RepositoryItem(
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
             modifier = Modifier
                 .size(20.dp)
+        )
+    }
+}
+
+@Composable
+@Preview
+private fun Preview() {
+    AppTheme {
+        SearchScreen(
+            viewModel = searchViewModelMock,
+            onSelect = { _, _ -> }
         )
     }
 }
