@@ -10,8 +10,8 @@ object BuildConfig {
     const val compileSdk = 34
     const val minSdk = 23
     const val targetSdk = 34
-    const val versionCode = 2
-    const val versionName = "1.0.1"
+    const val versionCode = 3
+    const val versionName = "1.1.0"
 
     const val JvmTarget = "17"
     val compatibility = JavaVersion.VERSION_17
