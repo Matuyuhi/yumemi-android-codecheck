@@ -8,7 +8,20 @@
 
 本アプリは GitHub のリポジトリを検索するアプリです。
 
-<img src="docs/app.gif" width="320">
+---
+## 追加機能
+- firebas統合(anlytics&crashlytics)
+- CIでtag作成時にtest&firebasにdeploy<br>
+  **AppTester招待リンク: [AppTester](https://appdistribution.firebase.dev/i/27ea1da0a9eef64c)**
+- ページングで20件ずつ(最大100)まで検索
+- ソート機能
+- リザルト画面(旧TwoFragment)の右上のボタンから、repoページを開く
+- マテリアルテーマ適応&locale対応
+
+---
+|                 before                 |                   after                    |
+|:--------------------------------------:|:------------------------------------------:|
+| <img src="docs/app.gif" width="300px"> | <img src="docs/app_new.gif" width="260px"> |
 
 ### 環境
 
@@ -34,10 +47,10 @@ Issues を確認した上、本プロジェクトを [**Duplicate** してくだ
 
 コードチェックの課題 Issue は全て [`課題`](https://github.com/yumemi-inc/android-engineer-codecheck/milestone/1) Milestone がついており、難易度に応じて Label が [`初級`](https://github.com/yumemi-inc/android-engineer-codecheck/issues?q=is%3Aopen+is%3Aissue+label%3A初級+milestone%3A課題)、[`中級`](https://github.com/yumemi-inc/android-engineer-codecheck/issues?q=is%3Aopen+is%3Aissue+label%3A中級+milestone%3A課題+) と [`ボーナス`](https://github.com/yumemi-inc/android-engineer-codecheck/issues?q=is%3Aopen+is%3Aissue+label%3Aボーナス+milestone%3A課題+) に分けられています。課題の必須／選択は下記の表とします。
 
-|   | 初級 | 中級 | ボーナス
-|--:|:--:|:--:|:--:|
-| 新卒／未経験者 | 必須 | 選択 | 選択 |
-| 中途／経験者 | 必須 | 必須 | 選択 |
+|         | 初級 | 中級 | ボーナス |
+|--------:|:--:|:--:|:----:|
+| 新卒／未経験者 | 必須 | 選択 |  選択  |
+|  中途／経験者 | 必須 | 必須 |  選択  |
 
 課題 Issueをご自身のリポジトリーにコピーするGitHub Actionsをご用意しております。  
 [こちらのWorkflow](./.github/workflows/copy-issues.yml)を[手動でトリガーする](https://docs.github.com/ja/actions/managing-workflow-runs/manually-running-a-workflow)ことでコピーできますのでご活用下さい。
