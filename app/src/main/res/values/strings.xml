@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Android Engineer CodeCheck</string>
-    <string name="searchInputText_hint">You can search for GitHub repositories!</string>
+    <string name="searchInputText_hint">You can search for Repositories!</string>
     <string name="written_owner">Written by %s</string>
-    <string name="created_at">created at:  %s</string>
+    <string name="created_at">created at:\n  %s</string>
     <string name="updated_at">updated at:\n %s</string>
     <string name="language">language: %s</string>
     <string name="star_count">stars: %s</string>
@@ -13,4 +13,10 @@
     <string name="topic_count">topics: %s</string>
     <string name="licence">LICENCE NAME: %s</string>
     <string name="search_update_at">Last search update: %s</string>
+    <string name="error_title">Error!</string>
+    <string name="error_description">Please check your internet connection and try again.</string>
+    <string name="error_retry">Retry</string>
+    <string name="close">Close</string>
+    <string name="search_result">search: %s</string>
+    <string name="sort">Sort</string>
 </resources>
