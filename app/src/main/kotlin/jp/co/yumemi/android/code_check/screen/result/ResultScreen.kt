@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,6 +37,7 @@ import jp.co.yumemi.android.code_check.data.ui.AppTheme
 import jp.co.yumemi.android.code_check.data.ui.replaceIfEmpty
 import jp.co.yumemi.android.code_check.mock.mockResultScreenArgsModel
 import jp.co.yumemi.android.code_check.screen.ResultScreenArgsModel
+import jp.co.yumemi.android.code_check.screen.TestTags
 
 @Composable
 fun ResultScreen(
@@ -61,6 +63,7 @@ fun ResultScreen(
                 uriHandler.openUri(model.url)
             },
             modifier = Modifier
+                .testTag(TestTags.ResultScreenUrlOpenButton.name)
                 .align(Alignment.End),
             enabled = model.url.isNotEmpty()
         ) {

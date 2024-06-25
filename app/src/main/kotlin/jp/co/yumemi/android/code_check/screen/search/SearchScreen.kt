@@ -53,6 +53,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,6 +69,7 @@ import jp.co.yumemi.android.code_check.data.ui.ErrorDialog
 import jp.co.yumemi.android.code_check.data.ui.LoadingDialog
 import jp.co.yumemi.android.code_check.data.ui.OnBottomReached
 import jp.co.yumemi.android.code_check.mock.searchViewModelMock
+import jp.co.yumemi.android.code_check.screen.TestTags
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -238,7 +240,9 @@ private fun InputField(
                     onClick = {
                         event.onSearchComplete()
                     },
-                    enabled = uiModel.isLoading.not() && uiModel.inputText.isNotEmpty()
+                    enabled = uiModel.isLoading.not() && uiModel.inputText.isNotEmpty(),
+                    modifier = Modifier
+                        .testTag(TestTags.SearchScreenSubmitButton.name)
                 ) {
                     Image(
                         Icons.Outlined.Search,
@@ -269,6 +273,7 @@ private fun InputField(
                 onSearch = { event.onSearchComplete() }
             ),
             modifier = Modifier
+                .testTag(TestTags.SearchScreenInputField.name)
                 .fillMaxWidth()
                 .padding(vertical = 10.dp, horizontal = 20.dp)
         )
@@ -371,6 +376,7 @@ private fun RepositoryItem(
     val owner = repository.owner
     Row(
         modifier = Modifier
+            .testTag(TestTags.SearchScreenRepositoryItemInList.name)
             .fillMaxWidth()
             .height(40.dp)
             .clickable { onClick() },
