@@ -19,7 +19,7 @@ jobs:
           cache: gradle
 
       - name: buildRelease
-        run: ./gradlew assembleDevelopmentRelease
+        run: ./gradlew assemble
       - name: upload artifact to Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1.7.0
         with:
