@@ -19,4 +19,5 @@
     <string name="close">閉じる</string>
     <string name="search_result">検索結果: %s件</string>
     <string name="sort">ソート</string>
+    <string name="open_in_new">Webで表示</string>
 </resources>
